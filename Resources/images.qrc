@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>images/Снимок экрана 2016-07-18 в 13.42.36.png</file>
+        <file>images/Save-icon.png</file>
+        <file>images/qqq.png</file>
+        <file>images/plus.png</file>
+        <file>images/misc_6569.png</file>
+        <file>images/folder_open.png</file>
+        <file>images/file_edit.png</file>
+        <file>images/button-play (2).png</file>
+        <file>images/browser-go.png</file>
+        <file>images/1470856924_RAM.png</file>
+        <file>images/148747.svg</file>
+        <file>images/148742.svg</file>
+    </qresource>
+</RCC>
