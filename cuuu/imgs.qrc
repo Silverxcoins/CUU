@@ -1,0 +1,43 @@
+<RCC>
+    <qresource prefix="/pref">
+        <file>//psf/Home/Desktop/Иконки/3floppy_unmount_8962.png</file>
+        <file>//psf/Home/Desktop/Иконки/edit_4616.png</file>
+        <file>//psf/Home/Desktop/Иконки/folder_4542.png</file>
+        <file>//psf/Home/Desktop/Иконки/folder_blue_2725.png</file>
+        <file>//psf/Home/Desktop/Иконки/folder_grey_open_6728.png</file>
+        <file>//psf/Home/Desktop/Иконки/folder_open.png</file>
+        <file>//psf/Home/Desktop/Иконки/juk_2055.png</file>
+        <file>//psf/Home/Desktop/Иконки/kedit_7369.png</file>
+        <file>//psf/Home/Desktop/Иконки/misc_6569.png</file>
+        <file>//psf/Home/Desktop/Иконки/viewmag_6379.png</file>
+        <file>//psf/Home/Desktop/Иконки/Снимок экрана 2016-07-17 в 15.35.33.png</file>
+        <file>//psf/Home/Desktop/Иконки/Снимок экрана 2016-07-17 в 15.43.24.png</file>
+        <file>//psf/Home/Desktop/Иконки/Снимок экрана 2016-07-17 в 16.03.36.png</file>
+        <file>//psf/Home/Desktop/Иконки/Снимок экрана 2016-07-18 в 1.33.46.png</file>
+        <file>//psf/Home/Desktop/Иконки/Снимок экрана 2016-07-18 в 1.36.26.png</file>
+        <file>//psf/Home/Desktop/Иконки/Снимок экрана 2016-07-18 в 13.36.03.png</file>
+        <file>//psf/Home/Desktop/Иконки/Снимок экрана 2016-07-18 в 13.38.35.png</file>
+        <file>//psf/Home/Desktop/Иконки/Снимок экрана 2016-07-18 в 13.39.51.png</file>
+        <file>//psf/Home/Desktop/Иконки/Снимок экрана 2016-07-18 в 13.42.36.png</file>
+        <file>//psf/Home/Desktop/Иконки/list-remove.png</file>
+        <file>//psf/Home/Desktop/Иконки/remove.png</file>
+        <file>//psf/Home/Desktop/Иконки/sign-delete-icon.png</file>
+        <file>//psf/Home/Desktop/Иконки/sign-delete-icon (1).png</file>
+        <file>//psf/Home/Desktop/Иконки/qqq.png</file>
+        <file>//psf/Home/Desktop/Иконки/plus.png</file>
+        <file>//psf/Home/Desktop/Иконки/save.png</file>
+        <file>//psf/Home/Desktop/Иконки/Save-icon.png</file>
+        <file>//psf/Home/Desktop/Иконки/Text-Document-icon.png</file>
+        <file>//psf/Home/Desktop/Иконки/Play-icon.png</file>
+        <file>//psf/Home/Desktop/Иконки/circled_play1600.png</file>
+        <file>//psf/Home/Desktop/Иконки/button-play.png</file>
+        <file>//psf/Home/Desktop/Иконки/button-play (1).png</file>
+        <file>//psf/Home/Desktop/Иконки/button-play (2).png</file>
+        <file>//psf/Home/Desktop/Иконки/ram_chip_thumb</file>
+        <file>//psf/Home/Desktop/Иконки/1470856924_RAM.png</file>
+        <file>//psf/Home/Desktop/Иконки/file_edit.png</file>
+        <file>//psf/Home/Desktop/Иконки/148747.svg</file>
+        <file>//psf/Home/Desktop/Иконки/148742.svg</file>
+        <file>//psf/Home/Desktop/Иконки/browser-go.png</file>
+    </qresource>
+</RCC>

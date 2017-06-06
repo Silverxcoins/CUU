@@ -9,7 +9,7 @@ public:
 
     ~StateValidator();
 
-    virtual State validate(QString &input, int &pos) const;
+    virtual State validate( QString & input, int & pos ) const;
 
 };
 

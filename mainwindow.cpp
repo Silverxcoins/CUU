@@ -1,14 +1,7 @@
 #include "mainwindow.h"
-#include "ttlineedit.h"
-#include "ramlineedit.h"
+#include "lineedits.h"
 #include "statevalidator.h"
 #include "ui_mainwindow.h"
-#include "styles.h"
-#include "errorsdialog.h"
-#include "executionwindow.h"
-#include "constants.h"
-#include "exitdialog.h"
-
 #include <QLineEdit>
 #include <QGridLayout>
 #include <QLabel>
@@ -17,57 +10,50 @@
 #include <QSignalMapper>
 #include <QScrollBar>
 #include <QColor>
-#include <QFileDialog>
-#include <QTextStream>
+
+QGridLayout *grid;
+int stringCounter = 0;
+int errors = 0;
+
+const char* OP_EVEN_STYLE = "QLineEdit {border: 0px; background-color: rgb(250,250,250); color: rgb(75,75,75); font-weight: bold;} QLineEdit:focus{border: 1px solid rgb(100,100,100);}";
+const char* OP_ODD_STYLE= "QLineEdit {border: 0px solid; color: rgb(75,75,75); font-weight: bold;} QLineEdit:focus {border: 1px solid rgb(100,100,100);}";
+const char* TT_LINE_EDIT_STYLE = "background-color: #f2f2f2; border-radius: 6px; font: 10pt \"Courier\"; font-weight: bold; color: #4C5866;";
+const char* TT_LINE_EDIT_ERROR_STYLE = "background-color: #f2f2f2; border-radius: 6px; border: 1px solid #E28383; font: 10pt \"Courier\"; font-weight: bold; color: #4C5866;";
+const char* STRING_NUMBER_LABEL_STYLE = "background-color: rgb(101, 220, 177); border-radius: 10px; color: rgb(255, 255, 255);";
 
 MainWindow::MainWindow(QWidget *parent) :
-        QMainWindow(parent),
-        ui(new Ui::MainWindow) {
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
+{
     ui->setupUi(this);
-    ui->mainToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 
-    stringCounter = 0;
-    rowInFocus = 0;
-    columnInFocus = INITIAL_STATE_COLUMN;
-    nErrors = 0;
-    isLastStringNeeded = false;
-    saveDir = QDir::homePath();
-    openDir = QDir::homePath();
-
-    ui->ramButton->setStyleSheet(BUTTON_UNCHECKED_STYLE);
-    ui->ramTable->hide();
-    ui->ramTableDecor->hide();
-    for (int pos = 0; pos < RAM_ROWS_COUNT; pos++) {
-        ui->ramVLayout->itemAt(pos)->widget()->hide();
-        ((QLabel*)ui->ramVLayout->itemAt(pos)->widget())
-                    ->setStyleSheet(RAM_LABEL_STYLE);
-    }
-
-    for (int pos = 0; pos < RAM_COLUMNS_COUNT; pos++) {
-        ui->ramHLayout->itemAt(pos)->widget()->hide();
-        ((QLabel*)ui->ramHLayout->itemAt(pos)->widget())
-                    ->setStyleSheet(RAM_LABEL_STYLE);
+    ui->OPButton->setStyleSheet("background-color: rgb(234, 234, 234); border: 1px solid  rgb(217, 217, 217)");
+    ui->OPTable->hide();
+    ui->OPTableDecor->hide();
+    for (int pos = 0; pos < 15; pos++) {
+        ui->OPVLayout->itemAt(pos)->widget()->hide();
+        ui->OPHLayout->itemAt(pos)->widget()->hide();
+        ((QLabel*)ui->OPHLayout->itemAt(pos)->widget())->setStyleSheet("border-radius: 8px; background-color: rgb(87, 161, 217); color: white; font-weight: bold;");
+        ((QLabel*)ui->OPVLayout->itemAt(pos)->widget())->setStyleSheet("border-radius: 8px; background-color: rgb(87, 161, 217); color: white; font-weight: bold;");
     }
 
     grid = new QGridLayout();
     ui->scrollAreaContents->setLayout(grid);
 
-    QSpacerItem *vSpacer = new QSpacerItem(1, 200,
-                                           QSizePolicy::Fixed,
-                                           QSizePolicy::Fixed);
+    QSpacerItem *vSpacer = new QSpacerItem(1, 200, QSizePolicy::Maximum, QSizePolicy::Maximum);
     grid->addItem(vSpacer, stringCounter, 1, 18, 1);
 
     addString(stringCounter);
 
-    for (int row = 0; row < RAM_ROWS_COUNT; row++)
-        ui->ramTable->setRowHeight(row, 23);
-    for (int column = 0; column < RAM_COLUMNS_COUNT; column++)
-        ui->ramTable->setColumnWidth(column, 35);
+    for (int row = 0; row < 15; row++)
+        ui->OPTable->setRowHeight(row, 23);
+    for (int column = 0; column < 15; column++)
+        ui->OPTable->setColumnWidth(column, 35);
 
-    RamLineEdit *ramCells[RAM_ROWS_COUNT][RAM_COLUMNS_COUNT];
-    for (int row = 0; row < RAM_ROWS_COUNT; row++)
-        for (int column = 0; column < RAM_COLUMNS_COUNT; column++) {
-            ramCells[row][column] = new RamLineEdit(ui->ramTable, row, column);
+    OPLineEdit *OPCells[15][15];
+    for (int row = 0; row < 15; row++)
+        for (int column = 0; column < 15; column++) {
+            OPCells[row][column] = new OPLineEdit(ui->OPTable, row, column);
         }
 }
 
@@ -75,102 +61,101 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::closeEvent(QCloseEvent *event) {
-    ExitDialog *exitDialog = new ExitDialog();
-    if ((*exitDialog).exec() == QDialog::Rejected) {
-        event->ignore();
-    } else {
-        emit closed();
-    }
-    delete exitDialog;
-}
+void MainWindow::addString(int stringNumber) {
+    if (stringNumber < stringCounter) {
+        addString(stringCounter);
 
-
-void MainWindow::on_actionNew_triggered() {
-    clearGrid();
-    stringCounter = 0;
-    nErrors = 0;
-    addString(stringCounter);
-    rowInFocus = 0;
-    columnInFocus = INITIAL_STATE_COLUMN;
-
-    for (int row = 0; row < RAM_ROWS_COUNT; row++) {
-        for (int column = 0; column < RAM_COLUMNS_COUNT; column++) {
-            getRamCell(row,column)->setText("00");
-        }
-    }
-
-    emit this->closed();
-}
-
-void MainWindow::on_actionOpen_triggered() {
-    ((TTLineEdit*)getTtField(rowInFocus,columnInFocus))->emitFocusOut();
-
-    QString fileName = QFileDialog::getOpenFileName(this, "",
-                                                    openDir, "*.cuu");
-    if (!fileName.isEmpty()) {
-        openDir = fileName;
-    } else {
-        return;
-    }
-
-    QFile file(fileName);
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        QTextStream in(&file);
-        QString data = in.readAll();
-
-        for (int pos = 0; pos < CONTROL_SEQUENCE.length(); pos++) {
-            if (data[pos] != CONTROL_SEQUENCE[pos]) {
-                return;
+        QLineEdit *lineEditTo = new QLineEdit();
+        QLineEdit *lineEditFrom = new QLineEdit();
+        for (int counter = stringCounter; counter > stringNumber; counter--) {
+            for (int column = 8; column >= 2; column -= 2) {
+            lineEditTo = (QLineEdit *)grid->itemAtPosition(counter - 1, column)->widget();
+            lineEditFrom = (QLineEdit *)grid->itemAtPosition(counter - 2, column)->widget();
+            lineEditTo->setText(lineEditFrom->text());
             }
         }
-
-        appDataFromText(data);
-        file.close();
-        emit this->closed();
-    }
-}
-
-void MainWindow::on_actionSave_triggered() {
-    ((TTLineEdit*)getTtField(rowInFocus,columnInFocus))->emitFocusOut();
-
-    QFileDialog *fileDialog = new QFileDialog(this, "", saveDir, "*.cuu");
-    fileDialog->setDefaultSuffix(".cuu");
-    QString fileName = fileDialog->getSaveFileName(this, "", saveDir, "*.cuu");
-    if (!fileName.isEmpty()) {
-        saveDir = fileName;
-        if (fileName.length() < 4
-                || fileName[fileName.length() - 4] != '.'
-                || fileName[fileName.length() - 3] != 'c'
-                || fileName[fileName.length() - 2] != 'u'
-                || fileName[fileName.length() - 1] != 'u') {
-            fileName += (QString)".cuu";
+        for (int column = 8; column >= 2; column -= 2) {
+            lineEditTo = (QLineEdit *)grid->itemAtPosition(stringNumber, column)->widget();
+            lineEditTo->clear();
         }
+        lineEditTo->setFocus();
     } else {
-        return;
-    }
+        // Íîìåð ñòðîêè
+        QLabel *stringNumberLabel = new QLabel(QString::number(stringNumber + 1));
+        stringNumberLabel->setMinimumWidth(20);
+        stringNumberLabel->setAlignment(Qt::AlignCenter);
+        stringNumberLabel->setStyleSheet(STRING_NUMBER_LABEL_STYLE);
 
-    QFile file(fileName);
-    if(file.open(QFile::WriteOnly | QFile::Text)) {
-        QTextStream out(&file);
-        out << appDataToText();
-        file.flush();
-        file.close();
+        // Ñïåéñåðû
+        QSpacerItem *hSpacer1 = new QSpacerItem(10, 20, QSizePolicy::Fixed, QSizePolicy::Fixed);
+        QSpacerItem *hSpacer2 = new QSpacerItem(8, 20, QSizePolicy::Fixed, QSizePolicy::Fixed);
+        QSpacerItem *hSpacer3 = new QSpacerItem(8, 20, QSizePolicy::Fixed, QSizePolicy::Fixed);
+        QSpacerItem *hSpacer4 = new QSpacerItem(9, 20, QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+        // Èñõîäíîå ñîñòîÿíèå
+        QLineEdit *initialStateLineEdit = new TTLineEdit(stringNumber, 0);
+        initialStateLineEdit->setMaximumWidth(86);
+        initialStateLineEdit->setAlignment(Qt::AlignCenter);
+        initialStateLineEdit->setMaxLength(3);
+        initialStateLineEdit->setValidator(new StateValidator());
+
+        // Ñëåäóþùåå ñîñòîÿíèå
+        QLineEdit *nextStateLineEdit = new TTLineEdit(stringNumber, 1);
+        nextStateLineEdit->setMaximumWidth(86);
+        nextStateLineEdit->setAlignment(Qt::AlignCenter);
+        nextStateLineEdit->setMaxLength(3);
+        nextStateLineEdit->setValidator(new StateValidator());
+
+        // Óñëîâèÿ ïåðåõîäà
+        QLineEdit *transitionConditionsLineEdit = new TTLineEdit(stringNumber, 2);
+        transitionConditionsLineEdit->setMaximumWidth(186);
+        transitionConditionsLineEdit->setTextMargins(5,0,5,0);
+        MainWindow::connect(transitionConditionsLineEdit, SIGNAL(textChanged(const QString &)),
+                            transitionConditionsLineEdit, SLOT(onTransitionConditionsChanged(const QString &)));
+
+        // Óïðàâëÿþùèå ñèãíàëû
+        QLineEdit *controlSignalsLineEdit = new TTLineEdit(stringNumber, 3);
+        controlSignalsLineEdit->setTextMargins(5,0,5,0);
+        MainWindow::connect(controlSignalsLineEdit, SIGNAL(textChanged(const QString &)),
+                            controlSignalsLineEdit, SLOT(onControlSignalsChanged(const QString &)));
+
+        grid->addWidget(stringNumberLabel, stringNumber, 0);
+        grid->addItem(hSpacer1, stringNumber, 1);
+        grid->addWidget(initialStateLineEdit, stringNumber, 2);
+        grid->addItem(hSpacer2, stringNumber, 3);
+        grid->addWidget(nextStateLineEdit, stringNumber, 4);
+        grid->addItem(hSpacer3, stringNumber, 5);
+        grid->addWidget(transitionConditionsLineEdit, stringNumber, 6);
+        grid->addItem(hSpacer4, stringNumber, 7);
+        grid->addWidget(controlSignalsLineEdit, stringNumber, 8);
+
+        initialStateLineEdit->setFocus();
+
+        QSignalMapper* signalMapper = new QSignalMapper(this) ;
+        MainWindow::connect(initialStateLineEdit, SIGNAL(returnPressed()), signalMapper, SLOT(map()));
+        MainWindow::connect(nextStateLineEdit, SIGNAL(returnPressed()), signalMapper, SLOT(map()));
+        MainWindow::connect(transitionConditionsLineEdit, SIGNAL(returnPressed()), signalMapper, SLOT(map()));
+        MainWindow::connect(controlSignalsLineEdit, SIGNAL(returnPressed()), signalMapper, SLOT(map()));
+
+        signalMapper -> setMapping (initialStateLineEdit, stringNumber + 1) ;
+        signalMapper -> setMapping (nextStateLineEdit, stringNumber + 1) ;
+        signalMapper -> setMapping (transitionConditionsLineEdit, stringNumber + 1) ;
+        signalMapper -> setMapping (controlSignalsLineEdit, stringNumber + 1) ;
+
+        connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(addString(int)));
+        stringCounter++;
     }
 }
 
 void MainWindow::on_editButton_clicked() {
-    ui->editButton->setStyleSheet(BUTTON_CHECKED_STYLE);
-    ui->ramButton->setStyleSheet(BUTTON_UNCHECKED_STYLE);
-    ui->ramTable->hide();
-    ui->ramTableDecor->hide();
-    for (int pos = 0; pos < RAM_ROWS_COUNT; pos++) {
-        ui->ramVLayout->itemAt(pos)->widget()->hide();
+    ui->editButton->setStyleSheet("border: 1px solid  rgb(217, 217, 217)");
+    ui->OPButton->setStyleSheet("background-color: rgb(234, 234, 234); border: 1px solid  rgb(217, 217, 217)");
+    ui->OPTable->hide();
+    ui->OPTableDecor->hide();
+    for (int pos = 0; pos < 15; pos++) {
+        ui->OPVLayout->itemAt(pos)->widget()->hide();
+        ui->OPHLayout->itemAt(pos)->widget()->hide();
     }
-    for(int pos = 0; pos < RAM_COLUMNS_COUNT; pos++) {
-        ui->ramHLayout->itemAt(pos)->widget()->hide();
-    }
-
     ui->label1->show();
     ui->label2->show();
     ui->label3->show();
@@ -180,13 +165,11 @@ void MainWindow::on_editButton_clicked() {
     ui->line3->show();
     ui->line4->show();
     ui->scrollArea->show();
-    ui->addButton->show();
-    ui->deleteButton->show();
 }
 
-void MainWindow::on_ramButton_clicked() {
-    ui->ramButton->setStyleSheet(BUTTON_CHECKED_STYLE);
-    ui->editButton->setStyleSheet(BUTTON_UNCHECKED_STYLE);
+void MainWindow::on_OPButton_clicked() {
+    ui->OPButton->setStyleSheet("border: 1px solid  rgb(217, 217, 217)");
+    ui->editButton->setStyleSheet("background-color: rgb(234, 234, 234); border: 1px solid  rgb(217, 217, 217)");
     ui->label1->hide();
     ui->label2->hide();
     ui->label3->hide();
@@ -196,405 +179,251 @@ void MainWindow::on_ramButton_clicked() {
     ui->line3->hide();
     ui->line4->hide();
     ui->scrollArea->hide();
-    ui->addButton->hide();
-    ui->deleteButton->hide();
-
-    ui->ramTable->show();
-    ui->ramTableDecor->show();
-    for (int pos = 0; pos < RAM_ROWS_COUNT; pos++) {
-        ui->ramVLayout->itemAt(pos)->widget()->show();
-    }
-    for(int pos = 0; pos < RAM_COLUMNS_COUNT; pos++) {
-        ui->ramHLayout->itemAt(pos)->widget()->show();
+    ui->OPTable->show();
+    ui->OPTableDecor->show();
+    for (int pos = 0; pos < 15; pos++) {
+        ui->OPVLayout->itemAt(pos)->widget()->show();
+        ui->OPHLayout->itemAt(pos)->widget()->show();
     }
 }
 
-void MainWindow::on_addButton_clicked() {
-    addString(rowInFocus + 1);
+TTLineEdit::TTLineEdit(int row, int column) : QLineEdit() {
+    this->row = row;
+    this->column = (column + 1) * 2;
+    this->setStyleSheet(TT_LINE_EDIT_STYLE);
+    this->isCorrect = true;
 }
 
-void MainWindow::on_deleteButton_clicked() {
-    deleteString();
-}
+TTLineEdit::~TTLineEdit() {}
 
-void MainWindow::on_startButton_pressed() {
-    ui->startButton->resize(START_NEXT_PRESSED_SIZE,
-                            START_NEXT_PRESSED_SIZE);
-}
-
-void MainWindow::on_startButton_clicked() {
-    ui->startButton->resize(START_NEXT_UNPRESSED_SIZE,
-                            START_NEXT_UNPRESSED_SIZE);
-    rejectTtChangesAndLaunch();
-    if (nErrors == 0) {
-        ExecutionWindow *executionWindow = new ExecutionWindow(this);
-        connect(executionWindow, SIGNAL(destroyed()),
-                this, SLOT(allowTtChangesAndLaunch()));
-        (*executionWindow).show();
-    } else {
-        QString error = tr("ÐŸÑ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ð° ÑÐ¾Ð´ÐµÑ€Ð¶Ð¸Ñ‚ Ð¾ÑˆÐ¸Ð±ÐºÐ¸");
-        QString info = tr("ÐŸÐ¾Ð»Ñ, ÑÐ¾Ð´ÐµÑ€Ð¶Ð°Ñ‰Ð¸Ðµ Ð¾ÑˆÐ¸Ð±ÐºÐ¸, Ð¿Ð¾Ð´ÑÐ²ÐµÑ‡ÐµÐ½Ñ‹ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼.\n");
-        info += tr("Ð˜ÑÐ¿Ñ€Ð°Ð²ÑŒÑ‚Ðµ Ð´Ð°Ð½Ð½Ñ‹Ðµ Ð¸ Ð¿Ð¾Ð¿Ñ€Ð¾Ð±ÑƒÐ¹Ñ‚Ðµ ÑÐ½Ð¾Ð²Ð°.");
-        ErrorsDialog *errorsDialog = new ErrorsDialog(error, info);
-        connect(errorsDialog, SIGNAL(accepted()),
-                this, SLOT(allowTtChangesAndLaunch()));
-        connect(errorsDialog, SIGNAL(rejected()),
-                this, SLOT(allowTtChangesAndLaunch()));
-        (*errorsDialog).exec();
+void TTLineEdit::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_W || event->key() == Qt::Key_Up) {
+        if (row > 0)
+            grid->itemAtPosition(row - 1, column)->widget()->setFocus();
+    }
+    else if(event->key() == Qt::Key_S || event->key() == Qt::Key_Down) {
+        if (row < stringCounter - 1)
+            grid->itemAtPosition(row + 1, column)->widget()->setFocus();
+    }
+    else if(event->key() == Qt::Key_A || (event->key() == Qt::Key_Left && this->cursorPosition() == 0)) {
+        if (column > 2)
+            grid->itemAtPosition(row, column - 2)->widget()->setFocus();
+    }
+    else if(event->key() == Qt::Key_D || (event->key() == Qt::Key_Right && this->cursorPosition() == this->text().length())) {
+        if (column < 8)
+            grid->itemAtPosition(row, column + 2)->widget()->setFocus();
+    }
+    else{
+        QLineEdit::keyPressEvent(event);
     }
 }
 
-void MainWindow::addString(int stringNumber) {
-    if (stringCounter > MAX_ROWS_COUNT) {
+void TTLineEdit::onTransitionConditionsChanged(const QString &data) {
+    if (data.length() == 0) {
+        this->setIsCorrect(true);
         return;
     }
 
-    bool isFirstPositionFirstString =
-            rowInFocus == 0
-            && columnInFocus == INITIAL_STATE_COLUMN
-            && stringCounter > 0
-            && getTtField(0,INITIAL_STATE_COLUMN)->cursorPosition() == 0;
-    if (isFirstPositionFirstString) {
-        if (getTtField(0,INITIAL_STATE_COLUMN)->text().isEmpty()) {
-            for (int i = NEXT_STATE_COLUMN;
-                 i <= CONTROL_SIGNALS_COLUMN;
-                 i += 2) {
-                if (!getTtField(0,i)->text().isEmpty()) {
-                    ((TTLineEdit*)getTtField(0,INITIAL_STATE_COLUMN))
-                            ->setIsCorrect(false);
-                }
-            }
+    bool isDataWrong = false;
+    char c;
+    if (data.length() == 1 || data.length() == 2) {
+        c = (data.length() == 1) ? data[0].toAscii() : data[1].toAscii();
+        isDataWrong = (c != 'b' && c != 'B' && c != 'z' && c != 'Z' && c != 'n' && c != 'N' && c != 'c' && c != 'C' && c != 'p' && c != 'P');
+        isDataWrong = (data.length() == 1) ? isDataWrong : (isDataWrong || (data[0].toAscii() != '-' && data[0].toAscii() != '!'));
+        if (!isDataWrong) {
+            this->setIsCorrect(true);
+            return;
         }
     }
 
-    if (isFirstPositionFirstString
-            && stringCounter == 1
-            && stringNumber == 1
-            && !isLastStringNeeded) {
-        stringNumber--;
-        isLastStringNeeded = true;
+    char currentCondition[4];
+    int commonCounter = 0;
+    int conditionsCounter = 0;
+    bool isDataEnded = false;
+    isDataWrong = false;
+    while (!isDataEnded && !isDataWrong) {
+        if (conditionsCounter == 4) isDataWrong = true;
 
+        int counter = 0;
+        do {
+            if (counter == 4) {
+                isDataWrong = true;
+                break;
+            }
+            c = data[commonCounter++].toAscii();
+            if (c != ' ') currentCondition[counter++] = c;
+            if (commonCounter == data.length()) {
+                isDataEnded = true;
+                break;
+            }
+        } while (c != ',');
+
+        if (currentCondition[0] != 'x' && currentCondition[0] != 'X') {
+            if ((currentCondition[0] != '-' && currentCondition[0] != '!')
+                 || (currentCondition[1] != 'x' && currentCondition[1] != 'X')
+                 || currentCondition[2] < '1'
+                 || currentCondition[2] > '4'
+                 || (isDataEnded
+                     && c != ','
+                     && c != ' '
+                     && (counter == 4 || c < '1' || c > '4'))) {
+                isDataWrong = true;
+            }
+        } else {
+            if (currentCondition[1] < '1'
+                || currentCondition[1] > '4'
+                || (isDataEnded
+                    && c != ','
+                    && c != ' '
+                    && (counter == 3 || c < '1' || c > '4'))) isDataWrong = true;
+        }
+        conditionsCounter++;
     }
 
-    if (stringNumber < stringCounter) {
-        addString(stringCounter);
-
-        int lastMovingString = stringNumber + 1;
-        if (isFirstPositionFirstString && stringNumber != 0) {
-            lastMovingString--;
-        }
-
-        TTLineEdit *lineEditTo;
-        TTLineEdit *lineEditFrom;
-        for (int counter = stringCounter - 1;
-             counter >= lastMovingString;
-             counter--) {
-            for (int column = CONTROL_SIGNALS_COLUMN;
-                 column >= INITIAL_STATE_COLUMN;
-                 column -= 2) {
-                lineEditTo = (TTLineEdit*)getTtField(counter, column);
-                lineEditFrom = (TTLineEdit*)getTtField(counter - 1, column);
-                lineEditTo->setText(lineEditFrom->text());
-                lineEditTo->setIsCorrect(lineEditFrom->getIsCorrect());
-            }
-        }
-        for (int column = CONTROL_SIGNALS_COLUMN;
-             column >= INITIAL_STATE_COLUMN;
-             column -= 2) {
-            lineEditTo = (TTLineEdit*)getTtField(lastMovingString - 1, column);
-            lineEditTo->clear();
-        }
-        lineEditTo->setFocus();
+    if (isDataWrong) {
+        this->setIsCorrect(false);
     } else {
-        QLabel *stringNumberLabel =
-                new QLabel(QString::number(stringNumber + 1));
-        stringNumberLabel->setMinimumWidth(25);
-        stringNumberLabel->setAlignment(Qt::AlignCenter);
-        stringNumberLabel->setStyleSheet(STRING_NUMBER_LABEL_STYLE);
-
-        QSpacerItem *hSpacer1 = new QSpacerItem(4, 20,
-                                                QSizePolicy::Fixed,
-                                                QSizePolicy::Fixed);
-        QSpacerItem *hSpacer2 = new QSpacerItem(8, 20,
-                                                QSizePolicy::Fixed,
-                                                QSizePolicy::Fixed);
-        QSpacerItem *hSpacer3 = new QSpacerItem(8, 20,
-                                                QSizePolicy::Fixed,
-                                                QSizePolicy::Fixed);
-        QSpacerItem *hSpacer4 = new QSpacerItem(9, 20,
-                                                QSizePolicy::Fixed,
-                                                QSizePolicy::Fixed);
-
-        QLineEdit *initialStateLineEdit =
-                new TTLineEdit(this, stringNumber, 0);
-        initialStateLineEdit->setMaximumWidth(86);
-        initialStateLineEdit->setAlignment(Qt::AlignCenter);
-        initialStateLineEdit->setMaxLength(3);
-        initialStateLineEdit->setValidator(new StateValidator());
-        connect(initialStateLineEdit, SIGNAL(editingFinished()),
-                initialStateLineEdit, SLOT(onStateEditingFinished()));
-        connect(initialStateLineEdit, SIGNAL(textChanged(const QString &)),
-                initialStateLineEdit, SLOT(onStateChanged(const QString &)));
-
-        QLineEdit *nextStateLineEdit =
-                new TTLineEdit(this, stringNumber, 1);
-        nextStateLineEdit->setMaximumWidth(86);
-        nextStateLineEdit->setAlignment(Qt::AlignCenter);
-        nextStateLineEdit->setMaxLength(3);
-        nextStateLineEdit->setValidator(new StateValidator());
-        connect(nextStateLineEdit, SIGNAL(editingFinished()),
-                nextStateLineEdit, SLOT(onStateEditingFinished()));
-        connect(nextStateLineEdit, SIGNAL(textChanged(const QString &)),
-                nextStateLineEdit, SLOT(onStateChanged(const QString &)));
-
-        QLineEdit *transitionConditionsLineEdit =
-                new TTLineEdit(this, stringNumber, 2);
-        transitionConditionsLineEdit->setMaximumWidth(235);
-        transitionConditionsLineEdit->setTextMargins(5,0,5,0);
-        transitionConditionsLineEdit->setMaxLength(27);
-        connect(transitionConditionsLineEdit,
-                SIGNAL(editingFinished()),
-                transitionConditionsLineEdit,
-                SLOT(onTransitionConditionsEditingFinished()));
-        connect(transitionConditionsLineEdit,
-                SIGNAL(textChanged(const QString &)),
-                transitionConditionsLineEdit,
-                SLOT(onTransitionConditionsChanged(const QString &)));
-
-        QLineEdit *controlSignalsLineEdit =
-                new TTLineEdit(this, stringNumber, 3);
-        controlSignalsLineEdit->setTextMargins(5,0,5,0);
-        controlSignalsLineEdit->setMaxLength(36);
-        connect(controlSignalsLineEdit,
-                SIGNAL(editingFinished()),
-                controlSignalsLineEdit,
-                SLOT(onControlSignalsEditingFinished()));
-       connect(controlSignalsLineEdit,
-               SIGNAL(textChanged(const QString &)),
-               controlSignalsLineEdit,
-               SLOT(onControlSignalsChanged(const QString &)));
-
-        grid->addWidget(stringNumberLabel, stringNumber, 0);
-        grid->addItem(hSpacer1, stringNumber, 1);
-        grid->addWidget(initialStateLineEdit,
-                        stringNumber, INITIAL_STATE_COLUMN);
-        grid->addItem(hSpacer2, stringNumber, 3);
-        grid->addWidget(nextStateLineEdit,
-                        stringNumber, NEXT_STATE_COLUMN);
-        grid->addItem(hSpacer3, stringNumber, 5);
-        grid->addWidget(transitionConditionsLineEdit,
-                        stringNumber, TRANSITION_CONDITIONS_COLUMN);
-        grid->addItem(hSpacer4, stringNumber, 7);
-        grid->addWidget(controlSignalsLineEdit,
-                        stringNumber, CONTROL_SIGNALS_COLUMN);
-
-        initialStateLineEdit->setFocus();
-
-        QSignalMapper *signalMapper = new QSignalMapper(this) ;
-        connect(initialStateLineEdit, SIGNAL(returnPressed()),
-                signalMapper, SLOT(map()));
-        connect(nextStateLineEdit, SIGNAL(returnPressed()),
-                signalMapper, SLOT(map()));
-        connect(transitionConditionsLineEdit, SIGNAL(returnPressed()),
-                signalMapper, SLOT(map()));
-        connect(controlSignalsLineEdit, SIGNAL(returnPressed()),
-                signalMapper, SLOT(map()));
-
-        signalMapper->setMapping(initialStateLineEdit,
-                                 stringNumber + 1) ;
-        signalMapper->setMapping(nextStateLineEdit,
-                                 stringNumber + 1) ;
-        signalMapper->setMapping(transitionConditionsLineEdit,
-                                 stringNumber + 1) ;
-        signalMapper->setMapping(controlSignalsLineEdit,
-                                 stringNumber + 1) ;
-
-        connect(signalMapper, SIGNAL(mapped(int)),
-                this, SLOT(addString(int)));
-
-        stringCounter++;
-        isLastStringNeeded = false;
-    }
-
-    if (stringCounter == MAX_ROWS_ON_SCREEN + 1)  {
-        ui->scrollArea->verticalScrollBar()->show();
+        this->setIsCorrect(true);
     }
 }
 
-void MainWindow::deleteString() {
-    if (rowInFocus == 0 && stringCounter == 1) {
+void TTLineEdit::onControlSignalsChanged(const QString &data) {
+    if (data.length() == 0) {
+        this->setIsCorrect(true);
         return;
     }
 
-    TTLineEdit *lineEditTo;
-    TTLineEdit *lineEditFrom;
-    if (rowInFocus < stringCounter - 1) {
-        for (int counter = rowInFocus;
-             counter < stringCounter - 1;
-             counter++) {
-            for (int column = INITIAL_STATE_COLUMN;
-                 column <= CONTROL_SIGNALS_COLUMN;
-                 column += 2) {
-                lineEditTo = (TTLineEdit*)getTtField(counter, column);
-                lineEditFrom = (TTLineEdit*)getTtField(counter + 1, column);
-                lineEditTo->setText(lineEditFrom->text());
-                lineEditTo->setIsCorrect(lineEditFrom->getIsCorrect());
+    char currentSignal[4];
+    char c;
+    int commonCounter = 0;
+    bool isDataWrong = false;
+    bool isDataEnded = false;
+    while (!isDataEnded && !isDataWrong) {
+        int counter = 0;
+        do {
+            if (commonCounter == data.length()) {
+                isDataEnded = true;
+                break;
             }
+            if (counter == 4) {
+                isDataWrong = true;
+                break;
+            }
+            c = data[commonCounter++].toAscii();
+            if (c != ' ') currentSignal[counter++] = c;
+        } while (c != ',');
+
+        if (currentSignal[0] != 'y' && currentSignal[0] != 'Y') isDataWrong = true;
+        if (isDataEnded && c != ',' && c != ' ' && (counter == 4 || c < '0' || c > '9')) isDataWrong = true;
+        for (int pos = 1; pos < counter - 1; pos++) {
+            if (currentSignal[pos] < '0' || currentSignal[pos] > '9') isDataWrong = true;
         }
     }
 
-    for (int column = INITIAL_STATE_COLUMN;
-         column <= CONTROL_SIGNALS_COLUMN;
-         column += 2) {
-        lineEditTo = (TTLineEdit*)getTtField(stringCounter - 1, column);
-        if (!lineEditTo->getIsCorrect()) {
-            decrementNErrors();
-        }
-        delete lineEditTo;
-    }
-    delete getTtField(stringCounter - 1, 0);
-    if (rowInFocus == stringCounter - 1) {
-        rowInFocus--;
-    }
-
-    stringCounter--;
-
-    if (stringCounter == MAX_ROWS_ON_SCREEN - 1) {
-        ui->scrollArea->verticalScrollBar()->hide();
+    if (isDataWrong) {
+        this->setIsCorrect(false);
+    } else {
+        this->setIsCorrect(true);
     }
 }
 
-QString MainWindow::appDataToText() {
-    QString data;
-
-    data += CONTROL_SEQUENCE;
-
-    data += QString::number(stringCounter) + CONTROL_SYMBOL;
-    for (int row = 0; row < stringCounter; row++) {
-        for (int column = INITIAL_STATE_COLUMN;
-             column <= CONTROL_SIGNALS_COLUMN;
-             column += 2) {
-            TTLineEdit *field = (TTLineEdit*)getTtField(row,column);
-            data += field->text() + CONTROL_SYMBOL;
+void TTLineEdit::setIsCorrect(bool isCorrect) {
+    if (isCorrect) {
+        if (!this->isCorrect) {
+            this->setStyleSheet(TT_LINE_EDIT_STYLE);
+            this->isCorrect = true;
+            errors--;
+        }
+    } else {
+        this->setStyleSheet(TT_LINE_EDIT_ERROR_STYLE);
+        if (this->isCorrect) {
+            this->isCorrect = false;
+            errors++;
         }
     }
-
-    for (int row = 0; row < RAM_ROWS_COUNT; row++) {
-        for (int column = 0; column < RAM_COLUMNS_COUNT; column ++) {
-            data += getRamCell(row, column)->text();
-        }
-    }
-
-    return data;
 }
 
-void MainWindow::appDataFromText(QString data) {
-    clearGrid();
-    nErrors = 0;
+OPLineEdit::OPLineEdit(QTableWidget *table, int row, int column) : QLineEdit() {
+    this->table = table;
+    this->row = row;
+    this->column = column;
+    this->setText("00");
+    this->setAlignment(Qt::AlignHCenter);
+    this->setInputMask(">HH");
+    if (row % 2 == 0)
+        this->setStyleSheet(OP_EVEN_STYLE);
+    else
+        this->setStyleSheet(OP_ODD_STYLE);
+    MainWindow::connect(this, SIGNAL(textChanged(const QString &)), this, SLOT(onTextChanged(const QString &)));
+    table->setCellWidget(row, column, this);
+}
 
-    int pos = CONTROL_SEQUENCE.length();
-    QChar c;
+OPLineEdit::~OPLineEdit() {}
 
-    QString nStringsText;
-    while ((c = data[pos++]) != CONTROL_SYMBOL) {
-        nStringsText += c;
-    }
-    for (stringCounter = 0; stringCounter < nStringsText.toInt();) {
-        addString(stringCounter);
-    }
-
-    int row = 0;
-    int column = INITIAL_STATE_COLUMN;
-    while (row < stringCounter) {
-        QString fieldText = "";
-        while ((c = data[pos++]) != '\0' && c != CONTROL_SYMBOL) {
-            fieldText += c;
+void OPLineEdit::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Up) {
+        if (row > 0) {
+            ((OPLineEdit*)table->cellWidget(row - 1, column))->setCursorPosition(this->cursorPosition());
+            ((OPLineEdit*)table->cellWidget(row - 1, column))->setFocus();
         }
-
-        TTLineEdit *field = (TTLineEdit*)getTtField(row,column);
-        field->setText(fieldText);
-        field->emitFocusOut();
-        if (column < CONTROL_SIGNALS_COLUMN) {
-            column += 2;
+    }
+    else if (event->key() == Qt::Key_Down) {
+        if (row < 14) {
+            ((OPLineEdit*)table->cellWidget(row + 1, column))->setCursorPosition(this->cursorPosition());
+            ((OPLineEdit*)table->cellWidget(row + 1, column))->setFocus();
+        }
+    }
+    else if (event->key() == Qt::Key_Left) {
+        if (column > 0 && this->cursorPosition() == 0) {
+            ((OPLineEdit*)table->cellWidget(row, column - 1))->setCursorPosition(1);
+            ((OPLineEdit*)table->cellWidget(row, column - 1))->setFocus();
         } else {
-            row++;
-            column = 2;
+            QLineEdit::keyPressEvent(event);
         }
     }
-
-    row = 0;
-    column = 0;
-    while(pos != data.length()) {
-        QString cellText = "";
-        for (int digitPos = 0; digitPos <= 1; digitPos++) {
-            cellText += data[pos++];
-        }
-        getRamCell(row,column)->setText(cellText);
-        if (column < RAM_COLUMNS_COUNT - 1) {
-            column++;
+    else if (event->key() == Qt::Key_Right) {
+        if (column < 14 && this->cursorPosition() > 0) {
+            ((OPLineEdit*)table->cellWidget(row, column + 1))->setCursorPosition(0);
+            ((OPLineEdit*)table->cellWidget(row, column + 1))->setFocus();
         } else {
-            row++;
-            column = 0;
+            QLineEdit::keyPressEvent(event);
+        }
+    }
+    else if (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete) {
+        this->insert("0");
+    }
+    else{
+        QLineEdit::keyPressEvent(event);
+    }
+}
+
+void OPLineEdit::onTextChanged(const QString &q)
+{
+    if (this->cursorPosition() == 2) {
+        if (column < 14) {
+            ((OPLineEdit*)table->cellWidget(row, column + 1))->setCursorPosition(0);
+            ((OPLineEdit*)table->cellWidget(row, column + 1))->setFocus();
+        } else if (row < 14) {
+            ((OPLineEdit*)table->cellWidget(row + 1, 0))->setCursorPosition(0);
+            ((OPLineEdit*)table->cellWidget(row + 1, 0))->setFocus();
         }
     }
 }
 
+StateValidator::StateValidator() : QValidator() {}
 
-void MainWindow::rejectTtChangesAndLaunch() {
-    ui->startButton->setEnabled(false);
-    ui->addButton->setEnabled(false);
-    ui->deleteButton->setEnabled(false);
-    ui->scrollAreaContents->setEnabled(false);
-}
+StateValidator::~StateValidator() {}
 
-void MainWindow::allowTtChangesAndLaunch() {
-    ui->startButton->setEnabled(true);
-    ui->addButton->setEnabled(true);
-    ui->deleteButton->setEnabled(true);
-    ui->scrollAreaContents->setEnabled(true);
-}
+QValidator::State StateValidator::validate(QString &input, int &pos) const {
+    if (input.isEmpty()) return QValidator::Acceptable;
 
-void MainWindow::clearGrid() {
-    for (int row = 0; row < stringCounter; row++) {
-        for (int column = 0; column <= CONTROL_SIGNALS_COLUMN; column += 2) {
-            delete getTtField(row,column);
-        }
+    bool b;
+    int value = input.toInt(&b);
+    if ((b == true) && (value >= 0) && (value <= 999))
+    {
+        return Acceptable;
     }
-}
 
-QLineEdit* MainWindow::getTtField(int row, int column) {
-    return (TTLineEdit*)grid->itemAtPosition(row,column)->widget();
-}
-
-RamLineEdit* MainWindow::getRamCell(int row, int column) {
-    return (RamLineEdit*)ui->ramTable->cellWidget(row,column);
-}
-
-int MainWindow::getStringCounter() {
-    return stringCounter;
-}
-
-void MainWindow::setFocus(int rowInFocus, int columnInFocus) {
-    this->rowInFocus = rowInFocus;
-    this->columnInFocus = columnInFocus;
-}
-
-int MainWindow::getRowInFocus() {
-    return this->rowInFocus;
-}
-
-int MainWindow::getColumnInFocus() {
-    return this->columnInFocus;
-}
-
-QTableWidget* MainWindow::getRamTable() {
-    return ui->ramTable;
-}
-
-void MainWindow::incrementNErrors() {
-    nErrors++;
-}
-
-void MainWindow::decrementNErrors() {
-    nErrors--;
+    return Invalid;
 }

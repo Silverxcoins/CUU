@@ -7,29 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>897</width>
-    <height>543</height>
+    <height>545</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>897</width>
-    <height>543</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>897</width>
-    <height>543</height>
-   </size>
-  </property>
   <property name="windowTitle">
-   <string>CUU</string>
+   <string>MainWindow</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(255, 255, 255);</string>
@@ -47,29 +29,21 @@
       <height>271</height>
      </rect>
     </property>
-    <property name="mouseTracking">
-     <bool>false</bool>
-    </property>
-    <property name="acceptDrops">
-     <bool>false</bool>
-    </property>
     <property name="toolTip">
-     <string>qq</string>
+     <string>Таблица переходов</string>
     </property>
     <property name="whatsThis">
-     <string>qqq</string>
+     <string>Таблица переходов</string>
     </property>
     <property name="styleSheet">
-     <string notr="true">border: 0px;
-outline: none;
-</string>
+     <string notr="true">border: 1px solid  rgb(217, 217, 217);</string>
     </property>
     <property name="text">
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="images.qrc">
-      <normaloff>:/new/prefix1/file_edit.png</normaloff>:/new/prefix1/file_edit.png</iconset>
+     <iconset resource="imgs.qrc">
+      <normaloff>:/pref/psf/Home/Desktop/Иконки/kedit_7369.png</normaloff>:/pref/psf/Home/Desktop/Иконки/kedit_7369.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -78,7 +52,7 @@ outline: none;
      </size>
     </property>
     <property name="checkable">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="checked">
      <bool>false</bool>
@@ -90,13 +64,13 @@ outline: none;
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="ramButton">
+   <widget class="QPushButton" name="OPButton">
     <property name="geometry">
      <rect>
       <x>0</x>
       <y>260</y>
       <width>51</width>
-      <height>271</height>
+      <height>261</height>
      </rect>
     </property>
     <property name="font">
@@ -106,27 +80,22 @@ outline: none;
      </font>
     </property>
     <property name="toolTip">
-     <string>qqq</string>
+     <string>Оперативная память</string>
     </property>
     <property name="styleSheet">
-     <string notr="true">border: 1px solid  rgb(217, 217, 217);
-outline: none;</string>
+     <string notr="true">border: 1px solid  rgb(217, 217, 217);</string>
     </property>
     <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="images.qrc">
-      <normaloff>:/new/prefix1/1470856924_RAM.png</normaloff>:/new/prefix1/1470856924_RAM.png</iconset>
+     <string>ОП</string>
     </property>
     <property name="iconSize">
      <size>
-      <width>49</width>
-      <height>47</height>
+      <width>16</width>
+      <height>16</height>
      </size>
     </property>
     <property name="checkable">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="checked">
      <bool>false</bool>
@@ -151,7 +120,8 @@ outline: none;</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true"/>
+     <string notr="true">
+</string>
     </property>
     <property name="orientation">
      <enum>Qt::Vertical</enum>
@@ -186,7 +156,7 @@ outline: none;</string>
    <widget class="Line" name="line4">
     <property name="geometry">
      <rect>
-      <x>550</x>
+      <x>500</x>
       <y>10</y>
       <width>16</width>
       <height>471</height>
@@ -261,7 +231,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label3">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>340</x>
       <y>10</y>
       <width>141</width>
       <height>20</height>
@@ -289,7 +259,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label4">
     <property name="geometry">
      <rect>
-      <x>630</x>
+      <x>610</x>
       <y>10</y>
       <width>171</width>
       <height>20</height>
@@ -324,25 +294,8 @@ color: rgb(255, 255, 255);</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">QWidget {
-background: rgb(0,0,0,0);
-border: 0px;
-}
-QScrollBar:vertical {
-width: 10px;
-}
-QScrollBar::handle:vertical {
-background: rgb(253,253,253);
-min-height: 20px;
-border-radius: 5px;
-border: 1px solid rgb(150,150,150);
-}
-QScrollBar::add-line:vertical {
-background-color: rgb(0,0,0,0);
-}
-QScrollBar::sub-line:vertical {
-background-color: rgb(0,0,0,0);
-}</string>
+     <string notr="true">background-color: rgba(0,0,0,0);
+border-radius: 10px;</string>
     </property>
     <property name="widgetResizable">
      <bool>true</bool>
@@ -356,21 +309,30 @@ background-color: rgb(0,0,0,0);
        <height>451</height>
       </rect>
      </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
+     <zorder>gridLayoutWidget</zorder>
+     <zorder>gridLayoutWidget</zorder>
+     <zorder>horizontalLayoutWidget</zorder>
+     <zorder>horizontalLayoutWidget</zorder>
+     <zorder>OPTable</zorder>
+     <zorder>verticalLayoutWidget</zorder>
+     <zorder>OPTable</zorder>
+     <zorder>horizontalLayoutWidget</zorder>
+     <zorder>verticalLayoutWidget</zorder>
+     <zorder>OPTable</zorder>
+     <zorder>horizontalLayoutWidget</zorder>
+     <zorder>verticalLayoutWidget</zorder>
+     <zorder>verticalLayoutWidget</zorder>
+     <zorder>horizontalLayoutWidget</zorder>
+     <zorder>OPTable</zorder>
     </widget>
    </widget>
-   <widget class="QTableWidget" name="ramTable">
+   <widget class="QTableWidget" name="OPTable">
     <property name="geometry">
      <rect>
-      <x>195</x>
-      <y>65</y>
-      <width>564</width>
-      <height>372</height>
+      <x>210</x>
+      <y>80</y>
+      <width>529</width>
+      <height>349</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -388,12 +350,6 @@ border-radius: 10px;}</string>
     </property>
     <property name="textElideMode">
      <enum>Qt::ElideRight</enum>
-    </property>
-    <property name="rowCount">
-     <number>16</number>
-    </property>
-    <property name="columnCount">
-     <number>16</number>
     </property>
     <attribute name="horizontalHeaderVisible">
      <bool>false</bool>
@@ -476,7 +432,6 @@ border-radius: 10px;}</string>
       <string>F</string>
      </property>
     </row>
-    <row/>
     <column>
      <property name="text">
       <string>1</string>
@@ -552,7 +507,6 @@ border-radius: 10px;}</string>
       <string>F</string>
      </property>
     </column>
-    <column/>
     <item row="0" column="0">
      <property name="text">
       <string notr="true">00</string>
@@ -565,33 +519,23 @@ border-radius: 10px;}</string>
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>44</y>
-      <width>561</width>
-      <height>22</height>
+      <x>210</x>
+      <y>59</y>
+      <width>521</width>
+      <height>21</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="ramHLayout">
+    <layout class="QHBoxLayout" name="OPHLayout">
      <property name="leftMargin">
-      <number>9</number>
+      <number>4</number>
      </property>
      <property name="bottomMargin">
       <number>4</number>
      </property>
      <item>
-      <widget class="QLabel" name="label_31">
-       <property name="text">
-        <string>0</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QLabel" name="label_15">
        <property name="text">
-        <string>1</string>
+        <string> 1</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -601,7 +545,7 @@ border-radius: 10px;}</string>
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>2</string>
+        <string> 2</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -611,7 +555,7 @@ border-radius: 10px;}</string>
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>3</string>
+        <string> 3</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -743,38 +687,19 @@ border-radius: 10px;}</string>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>159</x>
-      <y>60</y>
+      <x>179</x>
+      <y>80</y>
       <width>31</width>
-      <height>372</height>
+      <height>341</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="ramVLayout">
-     <property name="leftMargin">
-      <number>4</number>
-     </property>
+    <layout class="QVBoxLayout" name="OPVLayout">
      <property name="topMargin">
-      <number>9</number>
+      <number>5</number>
      </property>
      <property name="rightMargin">
-      <number>0</number>
+      <number>4</number>
      </property>
-     <item>
-      <widget class="QLabel" name="label_32">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QLabel" name="label_16">
        <property name="text">
@@ -927,12 +852,12 @@ border-radius: 10px;}</string>
      </item>
     </layout>
    </widget>
-   <widget class="QGroupBox" name="ramTableDecor">
+   <widget class="QGroupBox" name="OPTableDecor">
     <property name="geometry">
      <rect>
-      <x>151</x>
-      <y>25</y>
-      <width>621</width>
+      <x>166</x>
+      <y>30</y>
+      <width>591</width>
       <height>431</height>
      </rect>
     </property>
@@ -944,87 +869,23 @@ border: 1px solid  rgb(79, 91, 141);</string>
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="deleteButton">
-    <property name="geometry">
-     <rect>
-      <x>770</x>
-      <y>470</y>
-      <width>31</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QPushButton {border-image: url(:/new/prefix1/qqq.png);
-background-color: rgb(0,0,0,0);
-outline: none;}
-QPushButton:pressed {border: 1px solid black;}</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="addButton">
-    <property name="geometry">
-     <rect>
-      <x>730</x>
-      <y>470</y>
-      <width>31</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QPushButton {border-image: url(:/new/prefix1/plus.png) ;
-background-color: rgb(0,0,0,0);
-outline: none;}
-QPushButton:pressed {border: 1px solid black;}</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="startButton">
-    <property name="geometry">
-     <rect>
-      <x>820</x>
-      <y>450</y>
-      <width>51</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QPushButton {border-image: url(:/new/prefix1/button-play (2).png);
-background-color: rgb(0,0,0,0);
-outline: none;}
-QPushButton:pressed {border: 1px solid black;}
-</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <zorder>ramTableDecor</zorder>
+   <zorder>OPTableDecor</zorder>
    <zorder>line1</zorder>
-   <zorder>ramButton</zorder>
+   <zorder>OPButton</zorder>
    <zorder>editButton</zorder>
    <zorder>label1</zorder>
    <zorder>label2</zorder>
    <zorder>label3</zorder>
    <zorder>label4</zorder>
-   <zorder>ramTable</zorder>
+   <zorder>OPTable</zorder>
    <zorder>horizontalLayoutWidget</zorder>
    <zorder>verticalLayoutWidget</zorder>
    <zorder>line2</zorder>
    <zorder>line3</zorder>
    <zorder>line4</zorder>
    <zorder>scrollArea</zorder>
-   <zorder>deleteButton</zorder>
-   <zorder>addButton</zorder>
-   <zorder>startButton</zorder>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
    <property name="maximumSize">
     <size>
      <width>16777215</width>
@@ -1035,21 +896,17 @@ QPushButton:pressed {border: 1px solid black;}
     <bool>false</bool>
    </property>
    <property name="styleSheet">
-    <string notr="true">QToolBar { background-image: url(:/new/prefix1/Снимок экрана 2016-07-18 в 13.42.36.png);
-border-left: 0px;
-border-bottom: 1px solid rgb(150,150,150);}
+    <string notr="true">QToolBar {
+	background-image: url(:/pref/psf/Home/Desktop/Иконки/Снимок экрана 2016-07-18 в 13.42.36.png);}
 QToolButton { background-color: rgba(0,0,0,0); }
 QToolButton:hover { border-radius: 6px; border: 1px solid  rgb(150, 150, 150);  }</string>
    </property>
    <property name="movable">
     <bool>false</bool>
    </property>
-   <property name="allowedAreas">
-    <set>Qt::AllToolBarAreas</set>
-   </property>
    <property name="iconSize">
     <size>
-     <width>24</width>
+     <width>21</width>
      <height>24</height>
     </size>
    </property>
@@ -1068,32 +925,32 @@ QToolButton:hover { border-radius: 6px; border: 1px solid  rgb(150, 150, 150);  
   </widget>
   <action name="actionNew">
    <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/new/prefix1/misc_6569.png</normaloff>:/new/prefix1/misc_6569.png</iconset>
+    <iconset>
+     <normaloff>//psf/Home/Desktop/Иконки/misc_6569.png</normaloff>//psf/Home/Desktop/Иконки/misc_6569.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
    </property>
    <property name="toolTip">
-    <string>Новый</string>
+    <string>Новый Файл</string>
    </property>
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/new/prefix1/folder_open.png</normaloff>:/new/prefix1/folder_open.png</iconset>
+    <iconset resource="imgs.qrc">
+     <normaloff>:/pref/psf/Home/Desktop/Иконки/folder_open.png</normaloff>:/pref/psf/Home/Desktop/Иконки/folder_open.png</iconset>
    </property>
    <property name="text">
     <string>Open</string>
    </property>
    <property name="toolTip">
-    <string>Открыть</string>
+    <string>Открыть Файл</string>
    </property>
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/new/prefix1/Save-icon.png</normaloff>:/new/prefix1/Save-icon.png</iconset>
+    <iconset resource="imgs.qrc">
+     <normaloff>:/pref/psf/Home/Desktop/Иконки/3floppy_unmount_8962.png</normaloff>:/pref/psf/Home/Desktop/Иконки/3floppy_unmount_8962.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -1102,28 +959,10 @@ QToolButton:hover { border-radius: 6px; border: 1px solid  rgb(150, 150, 150);  
     <string>Сохранить</string>
    </property>
   </action>
-  <action name="actionStart">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/new/prefix1/Play-icon.png</normaloff>:/new/prefix1/Play-icon.png</iconset>
-   </property>
-   <property name="text">
-    <string>Start</string>
-   </property>
-   <property name="toolTip">
-    <string>qqq</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::TextHeuristicRole</enum>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>true</bool>
-   </property>
-  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="images.qrc"/>
+  <include location="imgs.qrc"/>
  </resources>
  <connections/>
 </ui>
